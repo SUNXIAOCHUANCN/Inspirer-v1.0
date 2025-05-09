@@ -99,76 +99,159 @@
         }
 
         /* AI助手窗口样式 */
-.assistant-container {
-    position: absolute;
-    right: 50px;
-    top: 100px;
-    width: 350px;
-    height: 400px;
-    background-color: #f0f8ff;
-    border: 1px solid #a8c7ff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
-    resize: both;
-    overflow: hidden;
-    min-width: 300px;
-    min-height: 300px;
-    cursor: default;
+        .assistant-container {
+            position: absolute;
+            right: 50px;
+            top: 100px;
+            width: 350px;
+            height: 400px;
+            background-color: #f0f8ff;
+            border: 1px solid #a8c7ff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            resize: both;
+            overflow: hidden;
+            min-width: 300px;
+            min-height: 300px;
+            cursor: default;
+        }
+
+        .assistant-header {
+            padding: 10px 15px;
+            background-color: #4a89dc;
+            color: white;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-btn {
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .assistant-chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: white;
+        }
+
+        .assistant-input-area {
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 5px;
+        }
+
+        #assistant-input {
+            flex: 1;
+            padding: 8px;
+        }
+
+        .assistant-message {
+            margin: 5px 0;
+            padding: 8px 12px;
+            border-radius: 4px;
+            max-width: 80%;
+        }
+
+        .assistant-message.user {
+            background-color: #e3f2fd;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .assistant-message.assistant {
+            background-color: #f5f5f5;
+            margin-right: auto;
+        }
+
+        /* 原始内容区域样式 */
+.assistant-raw-container {
+    border-top: 1px solid #ddd;
+    background-color: #f9f9f9;
 }
 
-.assistant-header {
-    padding: 10px 15px;
-    background-color: #4a89dc;
-    color: white;
-    cursor: move;
+.assistant-raw-header {
+    padding: 5px 10px;
+    background-color: #eaeaea;
+    cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.close-btn {
-    font-size: 20px;
+.assistant-raw-header h4 {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.toggle-raw {
+    font-size: 12px;
+}
+
+.assistant-raw-content {
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 8px;
+    font-size: 12px;
+    white-space: pre-wrap;
+    background-color: white;
+    border-top: 1px solid #eee;
+    display: none; /* 默认隐藏 */
+}
+
+.assistant-raw-content.show {
+    display: block; /* 展开时显示 */
+}
+
+/* 产品设计分析列表样式 */
+.design-category {
+    font-weight: bold;
+    padding: 8px 12px;
+    background-color: #e3f2fd;
+    border-radius: 4px;
+    margin: 5px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     cursor: pointer;
 }
 
-.assistant-chat {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
-    background-color: white;
+.design-category .toggle-icon {
+    transition: transform 0.3s;
 }
 
-.assistant-input-area {
-    padding: 10px;
-    border-top: 1px solid #ddd;
-    display: flex;
-    gap: 5px;
+.design-category.collapsed .toggle-icon {
+    transform: rotate(-90deg);
 }
 
-#assistant-input {
-    flex: 1;
-    padding: 8px;
+.design-features {
+    padding-left: 20px;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
 }
 
-.assistant-message {
-    margin: 5px 0;
-    padding: 8px 12px;
-    border-radius: 4px;
-    max-width: 80%;
-}
-
-.assistant-message.user {
-    background-color: #e3f2fd;
-    margin-left: auto;
-    text-align: right;
-}
-
-.assistant-message.assistant {
+.design-feature {
+    padding: 6px 10px;
     background-color: #f5f5f5;
-    margin-right: auto;
+    border-radius: 4px;
+    margin: 3px 0;
 }
+
+.design-single-item {
+    font-weight: bold;
+    padding: 8px 12px;
+    background-color: #e8f5e9;
+    border-radius: 4px;
+    margin: 5px 0;
+}
+
 
     </style>
 </head>
@@ -191,12 +274,27 @@
         <h2>AI 对话助手</h2>
         <span class="close-btn" onclick="toggleAssistant()">×</span>
     </div>
+    
+    <!-- 主聊天区域 - 只保留一个 -->
     <div id="assistant-chat" class="assistant-chat"></div>
+    
+    <!-- 原始内容区域移到输入框上方 -->
+    <div class="assistant-raw-container">
+        <div class="assistant-raw-header" onclick="toggleRawContent()">
+            <h4>原始内容</h4>
+            <span class="toggle-raw">▼</span>
+        </div>
+        <div id="assistant-raw-content" class="assistant-raw-content"></div>
+    </div>
+    
+    <!-- 输入区域保持在最底部 -->
     <div class="assistant-input-area">
         <input type="text" id="assistant-input" placeholder="输入你的问题...">
         <button onclick="sendToAssistant()">发送</button>
     </div>
 </div>
+
+
 
     
     <script>
@@ -431,31 +529,124 @@ function sendToAssistant() {
     const message = input.value.trim();
     if (!message) return;
 
-    appendAssistantMessage('user', message);
+    // 显示用户消息
+    const chatBox = document.getElementById('assistant-chat');
+    const userDiv = document.createElement('div');
+    userDiv.className = 'assistant-message user';
+    userDiv.textContent = message;
+    chatBox.appendChild(userDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
     
     fetch('/api/chat', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
             message: message,
-            user_id: 'user123' // 可以用实际用户ID
+            user_id: 'user123'
         })
     })
     .then(response => response.json())
     .then(data => {
+        // 解析并显示AI回复
         appendAssistantMessage('assistant', data.response);
+        // 更新原始内容
+        document.getElementById('assistant-raw-content').textContent = data.response;
     });
     
     input.value = '';
 }
 
+
 function appendAssistantMessage(sender, text) {
     const chatBox = document.getElementById('assistant-chat');
-    const div = document.createElement('div');
-    div.className = `assistant-message ${sender}`;
-    div.textContent = text;
-    chatBox.appendChild(div);
+    if (sender === 'user') {
+        // 用户消息保持简单显示
+        const div = document.createElement('div');
+        div.className = 'assistant-message user';
+        div.textContent = text;
+        chatBox.appendChild(div);
+    } else {
+        // 解析AI回复
+        try {
+            // 先清空AI回复区域
+        chatBox.innerHTML = '';
+        
+        // 解析AI回复
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        
+        lines.forEach(line => {
+            const match = line.match(/{([^:]+):\s*\[([^\]]+)\]}/);
+            const singleMatch = line.match(/{([^}]+)}/);
+            
+            if (match) {
+                const category = match[1].trim();  // 类别
+                    const features = match[2].split(',').map(f => f.trim());  // 特征项
+                    
+                    // 创建类别标题
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'design-category';
+                    categoryDiv.innerHTML = `
+                        <span>${category}</span>
+                        <span class="toggle-icon">▼</span>
+                    `;
+                    
+                    // 创建特征项列表
+                    const featuresDiv = document.createElement('div');
+                    featuresDiv.className = 'design-features';
+                    
+                    features.forEach(feature => {
+                        const featureDiv = document.createElement('div');
+                        featureDiv.className = 'design-feature';
+                        featureDiv.textContent = feature;
+                        featuresDiv.appendChild(featureDiv);
+                    });
+                    
+                    // 添加点击事件以控制展开和折叠
+                    categoryDiv.addEventListener('click', () => {
+                        categoryDiv.classList.toggle('collapsed');
+                        featuresDiv.style.display = categoryDiv.classList.contains('collapsed') ? 'none' : 'block';
+                    });
+                    
+                    // 添加到聊天框
+                    chatBox.appendChild(categoryDiv);
+                    chatBox.appendChild(featuresDiv);
+            } 
+            else if(singleMatch){
+                 // 如果是只有一个词的特征项（没有方括号的），去掉大括号并加粗显示
+                    const feature = singleMatch[1].trim();  // 单一的特征项
+                    const singleFeatureDiv = document.createElement('div');
+                    singleFeatureDiv.className = 'single-feature';
+                    singleFeatureDiv.style.fontWeight = 'bold';  // 加粗显示
+                    singleFeatureDiv.textContent = feature;
+                    
+                    chatBox.appendChild(singleFeatureDiv);
+            }
+            else {
+                // 不符合格式的直接显示
+                const fallbackDiv = document.createElement('div');
+                fallbackDiv.className = 'assistant-message assistant';
+                fallbackDiv.textContent = line;
+                chatBox.appendChild(fallbackDiv);
+            }
+        });
+        } catch (e) {
+            // 解析失败时显示原始内容
+            const fallbackDiv = document.createElement('div');
+            fallbackDiv.className = 'assistant-message assistant';
+            fallbackDiv.textContent = text;
+            chatBox.appendChild(fallbackDiv);
+        }
+    }
+    
     chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+
+function toggleRawContent() {
+    const rawContent = document.getElementById('assistant-raw-content');
+    const toggleBtn = document.querySelector('.toggle-raw');
+    rawContent.classList.toggle('show');
+    toggleBtn.textContent = rawContent.classList.contains('show') ? '▲' : '▼';
 }
 
 // 回车发送消息
